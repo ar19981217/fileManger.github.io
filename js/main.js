@@ -4,50 +4,48 @@ $(function () {
     var defLoc = location.href;
     var loc;
     var pathName;
+    var path;
     $.ajax({
         method: 'post',
         url: 'systems/core.php',
         success: function (data) {
-            $('.main').html(data);
+            var res = JSON.parse(data);
+            var dir = res.main.dir;
+            var file = res.main.file;
+            path = res.path;
+            console.log(res);
+            append(dir, file);
+            // $('.main .folder-list').html(res);
+            // console.log(path);
             dblclick();
         },
         error: function (error) {
-            console.log(error);
+            // console.log(error);
         }
     });
     function dblclick() {
         $('.folder-list li').on('dblclick', function () {
             pathName = $(this).text();
-            /*loc = defLoc;
-            if (location.href != defLoc){
-                loc = location.href+'/'+pathName;
+            /*if ($(this).hasClass('back')){
+                // console.log(path.split)
+            }else {
+                path = path+'/'+pathName;
             }*/
+            path = path+'/'+pathName;
 
+            console.log(path);
             $.ajax({
                 method: 'post',
                 url: 'systems/core.php',
-                data: {pathName: pathName},
+                data: {path: path},
                 success: function (data) {
-                    $('.main').html(data);
-                    // window.history.replaceState("Details", "Title", pathName);
-                    dblclick();
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            })
-        });
-        $('.folder-list li.back').on('dblclick', function () {
-            var back = $(this).text();
-            var loc = location.href;
-            var status = 'back';
-            $.ajax({
-                method: 'post',
-                url: 'systems/core.php',
-                data: {back: back, status: status},
-                success: function (data) {
-                    $('.main').html(data);
-                    // window.history.replaceState("Details", "Title", pathName);
+                    var res = JSON.parse(data);
+                    path = res.path;
+                    console.log(res);
+                    var dir = res.main.dir;
+                    var back = res.main.back;
+                    var file = res.main.file;
+                    append(dir, file, back);
                     dblclick();
                 },
                 error: function (error) {
@@ -57,4 +55,20 @@ $(function () {
         });
     }
 
+    function append(dir  = null ,file = null, back = null) {
+        $('.main .folder-list').html('');
+        if (back != null)
+        $('.main .folder-list').append(back);
+        if (dir != null){
+            for (let i = 0; i < dir.length; i++) {
+                $('.main .folder-list').append(dir[i]);
+            }
+        }
+       if (file != null){
+           for (let i = 0; i < file.length; i++) {
+               $('.main .folder-list').append(file[i]);
+           }
+       }
+
+    }
 });

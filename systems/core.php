@@ -1,63 +1,94 @@
 <?php
-echo $_SERVER['HTTP_HOST']. '/' . $_POST['pathName'];
-if ($_POST['status'] == 'back'){
-    $folder = $_SERVER['DOCUMENT_ROOT'] . '/' . $_POST['pathName'];
-}else{
-    $folder = $_SERVER['DOCUMENT_ROOT'] . '/' . $_POST['pathName'];
-}
+session_start();
+class Core
+{
+    private $arr = [];
+    public function __construct()
+    {
+        $this->getPath();
+//        $folder = $_SERVER['DOCUMENT_ROOT'] . '/' . $_POST['pathName'];
+//        $arr = array();
+//        array_push($arr, $folder);/
+//        $_SESSION['s'] = $_SERVER['DOCUMENT_ROOT'] . '/' . $_POST['pathName'];
+//        echo $_SESSION['s'];
+    }
 
-$handle = opendir($folder);
-$arr = [
-    'js',
-    'html',
-    'css',
-    'txt',
-    'php',
+    private function getPath()
+    {
+        $folder = $_SERVER['DOCUMENT_ROOT']. '/' . $_POST['path'];
+        $post = $_POST['path'];
+        $this->arr['path'][] = $post;
+        $this->retContent($folder);
+//        echo $_SERVER['REQUEST_URI'];
+        /*$arr = [];
+        array_push($arr, $folder);
+//        $this->dd($arr);
+        return json_encode($arr);*/
+//        $this->dd($_SERVER);
+        echo json_encode($this->arr);
+    }
+    public function retContent($folder)
+    {
 
-];
-$typeFileArray = array(
-    'js' => 'icons8-javascript-240.png',
-    'html' => 'iconfinder_HTML5_100117.png',
-    'css' => 'icons8-css-filetype-96.png',
-    'txt' => 'iconfinder_File_104851.png',
-    'php' => 'php.png'
-);
+        $handle = opendir($folder);
+        $arrFormat = [
+            'js',
+            'html',
+            'css',
+            'txt',
+            'php',
 
-if ($handle) {
-    echo "<ul class='folder-list'>";
-    while (false !== ($entry = readdir($handle))) {
-        if ($_SERVER['DOCUMENT_ROOT'] . '/' == $folder) {
-            if ($entry != '.' && $entry != '..') {
-                if (is_dir($folder . '/' . $entry)) {
-                    echo "<li><img class='type' src='../img/folder/iconfinder_folder_299060.png' alt=''>$entry</li>";
-                } else {
-                    foreach ($arr as $key => $value) {
-                        if (pathinfo($entry, PATHINFO_EXTENSION) == $value) {
-                            echo "<li class='file'><img class='type' src='../img/iconFile/" . $typeFileArray[$value] . "' alt=''>$entry</li>";
+        ];
+        $typeFileArray = array(
+            'js' => 'icons8-javascript-240.png',
+            'html' => 'iconfinder_HTML5_100117.png',
+            'css' => 'icons8-css-filetype-96.png',
+            'txt' => 'iconfinder_File_104851.png',
+            'php' => 'php.png'
+        );
+
+        if ($handle) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($_SERVER['DOCUMENT_ROOT'] . '/' == str_replace($folder, '..', '').'/') {
+                    if ($entry != '.' && $entry != '..') {
+                        if (is_dir($folder . '/' . $entry)) {
+                            $this->arr['main']['dir'][] = "<li><img class='type' src='../img/folder/iconfinder_folder_299060.png' alt=''>$entry</li>";
+                        } else {
+                            foreach ($arrFormat as $key => $value) {
+                                if (pathinfo($entry, PATHINFO_EXTENSION) == $value) {
+                                    $this->arr['main']['file'][] = "<li class='file'><img class='type' src='../img/iconFile/" . $typeFileArray[$value] . "' alt=''>$entry</li>";
+                                }
+                            }
                         }
                     }
-                }
-            }
-        } else {
-            if ($entry != '..') {
-                if ($entry == '.') {
-                    echo "<li class='back'><img class='type' src='../img/return.png' alt=''>$entry</li>";
                 } else {
-                    if (is_dir($folder . '/' . $entry)) {
-                        echo "<li><img class='type' src='../img/folder/iconfinder_folder_299060.png' alt=''>$entry</li>";
-                    } else {
-                        foreach ($arr as $key => $value) {
-                            if (pathinfo($entry, PATHINFO_EXTENSION) == $value) {
-                                echo "<li class='file'><img class='type' src='../img/iconFile/" . $typeFileArray[$value] . "' alt=''>$entry</li>";
+                    if ($entry != '.') {
+                        if ($entry == '..') {
+                            $this->arr['main']['back'][] = "<li class='back'><img class='type' src='../img/return.png' alt=''>$entry</li>";
+                        } else {
+                            if (is_dir($folder . '/' . $entry)) {
+                                $this->arr['main']['dir'][] = "<li><img class='type' src='../img/folder/iconfinder_folder_299060.png' alt=''>$entry</li>";
+                            } else {
+                                foreach ($arrFormat as $key => $value) {
+                                    if (pathinfo($entry, PATHINFO_EXTENSION) == $value) {
+                                        $this->arr['main']['file'][] = "<li class='file'><img class='type' src='../img/iconFile/" . $typeFileArray[$value] . "' alt=''>$entry</li>";
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }
 
-    echo '</ul>';
-    closedir($handle);
-    $arr = [$_SERVER['DOCUMENT_ROOT']];
+            closedir($handle);
+        }
+
+    }
+    public function dd($parm)
+    {
+        echo "<pre>";
+        print_r($parm);
+        echo "</pre>";
+    }
 }
+$manager = new Core;
