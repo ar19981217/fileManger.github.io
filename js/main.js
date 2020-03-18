@@ -7,7 +7,7 @@ $(function () {
     var path;
     $.ajax({
         method: 'post',
-        url: 'https://ar19981217.github.io/fileManger.github.io/systems/core.php',
+        url: 'https://github.com/ar19981217/fileManger.github.io/systems/core.php',
         success: function (data) {
             var res = JSON.parse(data);
             var dir = res.main.dir;
@@ -36,7 +36,7 @@ $(function () {
             console.log(path);
             $.ajax({
                 method: 'post',
-                url: 'https://ar19981217.github.io/fileManger.github.io/systems/core.php',
+                url: 'https://github.com/ar19981217/fileManger.github.io/systems/core.php',
                 data: {path: path},
                 success: function (data) {
                     var res = JSON.parse(data);
